@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #1e1e1e;
+      margin: 0;
+      padding: 0;
+      color: #f5f5f5;
+    }
+    
+    .container {
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      text-align: center;
+      color: #fff;
+      margin-bottom: 20px;
+    }
+    
+    .task-form {
+      width: 80%;
+      margin-bottom: 30px;
+    }
+    
+    .task-form input,
+    .task-form select {
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+    }
+    
+    .task-form button {
+      background-color: #00b894;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .tasks {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+    }
+    .w-50{
+        min-width:  50%;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .d-flex{
+        display: flex;
+        gap: 10px;
+        flex-direction: column;
+    }
+    
+    .task-column {
+      background-color: #2e2e2e;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .task-column h2 {
+      color: white;
+      text-align: center;
+    }
+    
+    .task-column.ongoing {
+      border-top: 5px solid #00cec9;
+    }
+    
+    .task-column.completed {
+      border-top: 5px solid #6c5ce7;
+    }
+    
+    .task-card {
+      background-color: #333;
+      margin-bottom: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    }
+    
+    .task-header .badge {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      color: white;
+      background-color: #3498db;
+    }
+    
+    .task-header .badge.completed {
+      background-color: #9b59b6;
+    }
+    
+    .task-content h3 {
+      margin: 0;
+      color: white;
+      font-size: 18px;
+    }
+    
+    .task-content p {
+      margin: 10px 0;
+      color: #ddd;
+      font-size: 14px;
+    }
+    
+    .task-meta {
+      font-size: 12px;
+      color: #bbb;
+    }
+    
+    .task-actions {
+      margin-top: 10px;
+      text-align: right;
+    }
+    
+    .task-actions button {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    
+      </style>
+</head>
+
+<body>
+    <div class="container">
+      <h1>Task Manager</h1>
+  
+      <!-- Add Task Form -->
+       <div class="row">
+        <div class="w-50">
+          <h2>Tasks</h2>
+          <form action="/add" method="POST" class="task-form d-flex">
+            <input type="text" name="task" placeholder="Enter a task" required>
+            <select name="type" required>
+              <option value="ongoing">Ongoing Task</option>
+              <option value="completed">Completed Task</option>
+            </select>
+            <input type="date" name="dueDate" required>
+            <button type="submit">Add Task</button>
+          </form>
+        </div>
+        <div class="w-50">
+          <h2>Completed Tasks</h2>
+          <div class="tasks">
+            <!-- Ongoing Tasks -->
+            <div class="task-column ongoing w-50">
+              <h2>Ongoing Task</h2>
+              <% tasks.ongoing.forEach(task => { %>
+                <div class="task-card">
+                  <div class="task-header">
+                    <span class="badge">Ongoing</span>
+                  </div>
+                  <div class="task-content">
+                    <h3><%= task.task %></h3>
+                    <p>Date: <%= task.dueDate %></p>
+                    <p>Details about the task...</p>
+                    <div class="task-meta">
+                      <p>Assigned by: Guru</p>
+                    </div>
+                  </div>
+                  <div class="task-actions">
+                    <form action="/move/?id=<%= task.id %>" method="POST">
+                      <input type="hidden" name="task" value="<%= task.task %>">
+                      <input type="hidden" name="from" value="ongoing">
+                      <input type="hidden" name="to" value="completed">
+                      <input type="hidden" name="dueDate" value="<%= task.dueDate %>">
+                      <input type="hidden" name="id" value="<%= task.id %>">
+                      <button>Move to Completed</button>
+                    </form>
+                  </div>
+                </div>
+              <% }); %>
+            </div>
+      
+            <!-- Completed Tasks -->
+            <div class="task-column completed w-50">
+              <h2>Completed Task</h2>
+              <% tasks.completed.forEach(task => { %>
+                <div class="task-card">
+                  <div class="task-header">
+                    <span class="badge completed">Completed</span>
+                  </div>
+                  <div class="task-content">
+                    <h3><%= task.task %></h3>
+                    <p>Date: <%= task.dueDate %></p>
+                    <p>Task summary...</p>
+                    <div class="task-meta">
+                      <p>Completed by: Guru</p>
+                    </div>
+                  </div>
+                  <div class="task-actions">
+                    <form action="/delete/?id=<%= task.id %>" method="POST">
+                      <input type="hidden" name="task" value="<%= task %>">
+                      <input type="hidden" name="type" value="completed">
+                      <input type="hidden" name="id" value="<%= task.id %>">
+                      <button>Delete</button>
+                    </form>
+                  </div>
+                </div>
+              <% }); %>
+            </div>
+          </div>
+        </div>
+       </div>
+      
+  
+      <!-- Task Columns -->
+      
+    </div>
+  </body>
+
+</html>
